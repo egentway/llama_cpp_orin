@@ -25,42 +25,50 @@
     lib = nixpkgs.lib;
     system = "aarch64-linux";
     llama-jetson = llama-cpp.packages."${system}".jetson-orin.overrideAttrs (old: {
-      cmakeFlags =
-        (old.cmakeFlags or [])
-        ++ [
-          "-DLLAMA_CURL=ON"
-          "-DLLAMA_OPENSSL=ON"
-        ];
+      buildInputs = (old.buildInputs or []) ++ [ pkgs.openssl ];
+      cmakeFlags = (old.cmakeFlags or []) ++ [ "-DLLAMA_OPENSSL=ON" ];
     });
 
     tegra-path = "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/aarch64-linux-gnu/tegra";
     model-flag = "-hf unsloth/Qwen3.5-2B-GGUF:Q4_K_S";
+    config-flags = ''
+      --ctx-size 32768 \
+      --n-gpu-layers 99 \
+      --flash-attn on \
+      -ctk bf16 \
+      -ctv bf16 \
+      --threads 6'';
 
     llama-server-default = pkgs.writeShellScriptBin "llama-server-default" ''
       ${tegra-path}
       exec ${llama-jetson}/bin/llama-server \
-        ${model-flag}
-        --host 0.0.0.0 --port 8080 \
-        --n-gpu-layer 99 \
+        ${model-flag} \
+        ${config-flags} \
+        --host 0.0.0.0 \
+        --port 8080 \
         "$@"
     '';
 
     llama-cli-default = pkgs.writeShellScriptBin "llama-cli-default" ''
       ${tegra-path}
-      exec ${llama-jetson}/bin/llama-server \
-        ${model-flag}
-        --n-gpu-layer 99 \
+      exec ${llama-jetson}/bin/llama-cli \
+        ${model-flag} \
+        ${config-flags} \
         "$@"
     '';
 
     dockerImage = pkgs.dockerTools.buildImage {
       name = "llama-cpp-jetson";
       tag = "latest";
-      contents = [
-        llama-jetson
-        pkgs.bash
-        pkgs.coreutils
-      ];
+      copyToRoot = pkgs.buildEnv {
+        name = "image-root";
+        paths = [
+          llama-jetson
+          pkgs.bash
+          pkgs.coreutils
+        ];
+        pathsToLink = ["/bin"];
+      };
       config = {
         Cmd = ["${llama-jetson}/bin/llama-server"];
         Env = [
@@ -69,18 +77,6 @@
         Expose = {
           "8080/tcp" = {};
         };
-      };
-    };
-    contents = [
-      llama-jetson
-    ];
-    config = {
-      Cmd = ["${llama-jetson}/bin/llama-server"];
-      Env = [
-        "LD_LIBRARY_PATH=/usr/local/cuda/compat:${pkgs.llvmPackages_latest.libcxx}/lib"
-      ];
-      Expose = {
-        "8080/tcp" = {};
       };
     };
   in {
