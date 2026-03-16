@@ -30,13 +30,13 @@
     });
 
     tegra-path = "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/aarch64-linux-gnu/tegra";
-    model-flag = "-hf unsloth/Qwen3.5-2B-GGUF:Q4_K_S";
+    model-flag = "-hf unsloth/Qwen3.5-2B-GGUF:Q4_K_M";
     config-flags = ''
-      --ctx-size 32768 \
+      --ctx-size 4096 \
       --n-gpu-layers 99 \
       --flash-attn on \
-      -ctk bf16 \
-      -ctv bf16 \
+      -ctk q8_0 \
+      -ctv q8_0 \
       --threads 6'';
 
     llama-server-default = pkgs.writeShellScriptBin "llama-server-default" ''
