@@ -22,11 +22,10 @@
     ...
   }: let
     pkgs = nixpkgs.legacyPackages.${system};
-    lib = nixpkgs.lib;
     system = "aarch64-linux";
     llama-jetson = llama-cpp.packages."${system}".jetson-orin.overrideAttrs (old: {
-      buildInputs = (old.buildInputs or []) ++ [ pkgs.openssl ];
-      cmakeFlags = (old.cmakeFlags or []) ++ [ "-DLLAMA_OPENSSL=ON" ];
+      buildInputs = (old.buildInputs or []) ++ [pkgs.openssl];
+      cmakeFlags = (old.cmakeFlags or []) ++ ["-DLLAMA_OPENSSL=ON"];
     });
 
     tegra-path = "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/aarch64-linux-gnu/tegra";
