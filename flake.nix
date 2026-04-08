@@ -29,7 +29,7 @@
     });
 
     tegra-path = "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/aarch64-linux-gnu/tegra";
-    model-flag = "-hf unsloth/Qwen3.5-2B-GGUF:Q4_K_M";
+    model-flag = "-hf unsloth/gemma-4-E2B-it-GGUF:Q4_K_M";
 
     # --chat-template-kwargs '{"enable_thinking":false}' \
     config-flags = ''
