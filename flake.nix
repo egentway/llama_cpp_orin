@@ -30,10 +30,14 @@
 
     tegra-path = "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/aarch64-linux-gnu/tegra";
     model-flag = "-hf unsloth/Qwen3.5-2B-GGUF:Q4_K_M";
+
+    # --chat-template-kwargs '{"enable_thinking":false}' \
     config-flags = ''
-      --ctx-size 4096 \
+      --reasoning off \
+      --ctx-size 16384 \
       --n-gpu-layers 99 \
       --flash-attn on \
+      --cache-ram 0 \
       -ctk q8_0 \
       -ctv q8_0 \
       --threads 6'';
