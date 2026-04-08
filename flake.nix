@@ -42,13 +42,25 @@
       -ctv q8_0 \
       --threads 6'';
 
+    server-flags = ''
+      ${config-flags} \
+      --host 0.0.0.0 \
+      --port 8080'';
+
     llama-server-default = pkgs.writeShellScriptBin "llama-server-default" ''
       ${tegra-path}
       exec ${llama-jetson}/bin/llama-server \
+        ${server-flags} \
         ${model-flag} \
-        ${config-flags} \
-        --host 0.0.0.0 \
-        --port 8080 \
+        "$@"
+    '';
+
+    llama-server-router = pkgs.writeShellScriptBin "llama-server-router" ''
+      ${tegra-path}
+      exec ${llama-jetson}/bin/llama-server \
+        ${server-flags} \
+        --models-preset ${./preset.ini} \
+        --models-max 1 \
         "$@"
     '';
 
@@ -91,6 +103,7 @@
       buildInputs = [
         llama-jetson
         llama-server-default
+        llama-server-router
         llama-cli-default
       ];
       shellHook = ''
@@ -98,9 +111,16 @@
       '';
     };
 
-    apps."${system}".default = {
-      type = "app";
-      program = "${llama-server-default}/bin/llama-server-default";
+    apps."${system}" = {
+      default = {
+        type = "app";
+        program = "${llama-server-default}/bin/llama-server-default";
+      };
+
+      llama-server-router = {
+        type = "app";
+        program = "${llama-server-router}/bin/llama-server-router";
+      };
     };
   };
 }

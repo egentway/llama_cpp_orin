@@ -2,8 +2,14 @@
 
 Nix flake to run llama.cpp with CUDA acceleration on the Jetson Orin Nano.
 
-To run the default config (Qwen 3.5 2B with Q4_K_M and 4096 context window size):
+To run the default server config:
 
 ```bash
 nix run
+```
+
+To run `llama-server` in router mode:
+
+```bash
+nix run .#llama-server-router
 ```
