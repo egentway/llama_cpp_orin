@@ -29,23 +29,29 @@
     });
 
     tegra-path = "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/aarch64-linux-gnu/tegra";
-    model-flag = "-hf unsloth/gemma-4-E2B-it-GGUF:Q4_K_M";
+    model-flag = "-hf unsloth/gemma-4-E2B-it-GGUF:Q5_K_M";
 
     # --chat-template-kwargs '{"enable_thinking":false}' \
+    # about ctx-checkpoints=1
+    # https://www.reddit.com/r/LocalLLaMA/comments/1t3dfvp/comment/ojw34v4/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
     config-flags = ''
       --reasoning off \
-      --ctx-size 16384 \
+      --ctx-size 32768 \
       --n-gpu-layers 99 \
       --flash-attn on \
       --cache-ram 0 \
       -ctk q8_0 \
       -ctv q8_0 \
+      -ctxcp 0 \
+      -cpent 0 \
       --threads 6'';
 
     server-flags = ''
       ${config-flags} \
       --host 0.0.0.0 \
-      --port 8080'';
+      --port 8080 \
+      --jinja \
+      --webui-mcp-proxy'';
 
     llama-server-default = pkgs.writeShellScriptBin "llama-server-default" ''
       ${tegra-path}
