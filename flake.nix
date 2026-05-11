@@ -36,7 +36,7 @@
     # https://www.reddit.com/r/LocalLLaMA/comments/1t3dfvp/comment/ojw34v4/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
     config-flags = ''
       --reasoning off \
-      --ctx-size 32768 \
+      --ctx-size 16384 \
       --n-gpu-layers 99 \
       --flash-attn on \
       --cache-ram 0 \
